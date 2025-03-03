@@ -1,12 +1,7 @@
-import TaskList from "./components/task/taskList";
+import AppRoutes from "./router";
 
 function App() {
-  return (
-    <div>
-      <h1>My Trello Client</h1>
-      <TaskList />
-    </div>
-  );
+  return <AppRoutes />; 
 }
 
 export default App;
