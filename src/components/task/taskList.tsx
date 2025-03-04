@@ -20,12 +20,16 @@ const TaskList = () => {
 
   return (
     <div>
-      <h2>Tasks</h2>
-      <ul>
-        {tasks.map((task) => (
-          <li key={task.id}>{task.title}</li>
-        ))}
-      </ul>
+      {tasks.map((task) => (
+        
+      <div key={task.id} className="task-card">
+        <input type="checkbox" id="task1" />
+        <label>
+          <h3>{task.title}</h3>
+          <p>{task.description}</p>
+        </label>
+      </div>
+      ))}
     </div>
   );
 };

@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "../contexts/userContext";
 import { User } from "../domain/user";
+import { toast } from "react-toastify";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -17,13 +18,14 @@ function Login() {
         name: "",
         password: password
      };
-
      
     try {
-        login(user);
+        await login(user);
         navigate('/tasks');
     } catch (error) {
-        alert(error);
+      var msg = `${error}`
+      console.error(msg);
+      toast.error(msg);
     }
   };
 
