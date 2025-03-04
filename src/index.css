@@ -51,6 +51,11 @@ body {
   border-radius: 5px;
 }
 
+.main-content {
+  margin-top: 70px; /* Adjust based on navbar height */
+  padding: 20px;
+}
+
 button {
   width: 100%;
   padding: 10px;
@@ -65,3 +70,39 @@ button {
 button:hover {
   background: #0056b3;
 }
+
+.navbar {
+  position: fixed;  /* Makes it stay at the top */
+  top: 0;
+  left: 0;
+  width: 100%;  /* Occupies full horizontal width */
+  height: 60px; /* Adjust height as needed */
+  background-color: #333;
+  color: white;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 20px;
+  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000; /* Ensures it stays above other content */
+}
+
+.navbar-user {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.logout-btn {
+  background-color: #ff4d4d;
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.logout-btn:hover {
+  background-color: #cc0000;
+}
+
