@@ -1,6 +1,6 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { loginUserAsync } from "../services/api";
-import { User } from "../domain/user";
+import { loginUserAsync } from "../services/Api";
+import { User } from "../domain/User";
 
 interface UserContextType {
   user: User | null;

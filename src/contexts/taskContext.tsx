@@ -1,5 +1,5 @@
 import { createContext, useContext, useState, ReactNode } from "react";
-import { Task } from "../domain/task";
+import { Task } from "../domain/Task";
 
 interface TaskContextType {
   tasks: Task[];

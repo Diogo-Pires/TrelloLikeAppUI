@@ -1,34 +1,30 @@
 import { Route, Routes, Navigate, BrowserRouter as Router } from "react-router-dom";
-import Login from './pages/login';
-import { useAuth, UserProvider, useUserContext } from './contexts/userContext';
-import { TaskProvider } from "./contexts/taskContext";
+import Login from './pages/Login';
+import { TaskProvider } from "./contexts/TaskContext";
 import { JSX } from "react";
 import { ToastContainer } from "react-toastify";
-import Tasks from "./pages/tasks";
-import Navbar from "./components/navbar";
+import Tasks from "./pages/Tasks";
+import Navbar from "./components/Navbar";
 
 function PrivateRoute({ element }: { element: JSX.Element }) {
-    const { user } = useAuth();
+  const token = sessionStorage.getItem("token")
   
-    if (!user) {
+    if (token === undefined) {
       return <Navigate to="/" />;
     }
   
     return element;
   }
 
-function AppContent() {
-  const { user, logout } = useUserContext();
-
-  const isNotProtected = location.pathname === "/";
-
+function AppContent() {  
+  const token = sessionStorage.getItem("token");
+//&& <Navbar user={"user"} logout={logout} />
   return (
     <>
-      {user && <Navbar user={user} logout={logout} />}
-      {!isNotProtected ? (
+      {token !== undefined ? (
         <div className="main-content">
-          <Routes>
-            <Route path="/tasks" element={<PrivateRoute element={<TaskProvider><Tasks /></TaskProvider>}/> }/>
+          <Routes><Route path="/" element={<Login />} />
+            <Route path="/tasks" element={<TaskProvider><Tasks /></TaskProvider>}/>
           </Routes>
         </div>
       ) : (
@@ -43,9 +39,7 @@ function AppContent() {
 export default function AppRoutes() {
   return (
     <Router>
-      <UserProvider>
         <AppContent />
-      </UserProvider>
       <div>
          <ToastContainer /> {}
       </div>
