@@ -2,19 +2,20 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import GoogleLoginButton from "../components/GoogleLoginButton";
+import { SessionManagementService } from "../services/SessionManagementService";
 
-function Login() {
+function LoginPage() {
   const [token, setToken] = useState<string | undefined>(undefined);
   const navigate = useNavigate();
 
   const handleLoginSuccess = async (token: string | undefined) => {
     if(token === undefined)
       return;
-    
+  
     setToken(token); 
 
     try {
-      sessionStorage.setItem("token", token); 
+      SessionManagementService.saveToken(token); 
       navigate('/tasks');
     } catch (error) {
       var msg = `${error}`
@@ -28,10 +29,10 @@ function Login() {
       {!token ? (
         <GoogleLoginButton onLoginSuccess={handleLoginSuccess} />
       ) : (
-        <div></div>
+        <></>
       )}
     </div>
   );
 }
 
-export default Login;
+export default LoginPage;

@@ -1,6 +1,6 @@
 import axios from "axios";
 import { Task } from "../domain/Task";
-import { User } from "../domain/User";
+import { SessionManagementService } from "./SessionManagementService";
 
 const API_URL = "https://localhost:7223/";
 
@@ -12,7 +12,7 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
-    const token = sessionStorage.getItem("token");
+    const token = SessionManagementService.getToken();
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`; 
@@ -26,12 +26,12 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => response, // If response is OK, return it
+  (response) => response, 
   (error) => {
     if (error.response?.status === 401) {
       console.error("Token expired. Logging out...");
-      sessionStorage.removeItem("token");
-      window.location.href = "/login"; // Redirect to login page
+      SessionManagementService.logout();
+      window.location.href = "/login";
     }
     return Promise.reject(error);
   }
@@ -40,9 +40,4 @@ api.interceptors.response.use(
 export const fetchTasks = async (): Promise<Task[]> => {
   const response = await api.get("/tasks/");
   return response.data;
-};
-
-export const loginUserAsync = async (userData: User) => {
-  const response = await api.get(`/user/${userData.email}`);
-  return response.data
 };

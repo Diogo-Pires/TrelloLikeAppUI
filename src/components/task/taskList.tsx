@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { useTaskContext } from "../../contexts/TaskContext";
-import { fetchTasks } from "../../services/Api";
+import { fetchTasks } from "../../services/MainBackendAPIService";
 
 const TaskList = () => {
   const { tasks, setTasks } = useTaskContext();

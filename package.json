@@ -12,6 +12,7 @@
   "dependencies": {
     "@react-oauth/google": "^0.12.1",
     "fs": "^0.0.1-security",
+    "jwt-decode": "^4.0.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-toastify": "^11.0.5"

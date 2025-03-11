@@ -1,16 +1,9 @@
-import { useNavigate } from "react-router-dom";
+import { SessionManagementService } from "../services/SessionManagementService";
 
-interface NavbarProps {
-    user: { name: string };
-    logout: () => void;
-}
-
-const Navbar = ({ user, logout }: NavbarProps) => {
-  const navigate = useNavigate();
-
+const Navbar = () => {
+  const user = SessionManagementService.getAuhenticateUser();
   const handleLogout = () => {
-    logout();
-    navigate("/"); 
+    SessionManagementService.logout(); 
   };
 
   return (

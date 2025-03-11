@@ -1,7 +1,7 @@
-import TaskList from "../components/task/taskList";
+import TaskList from "../components/task/TaskList";
 import "../pages/tasks.css";
 
-function Tasks() {
+function TasksPage() {
 
   return (
     <div className="task-list">
@@ -11,4 +11,4 @@ function Tasks() {
   );
 }
 
-export default Tasks;
+export default TasksPage;
