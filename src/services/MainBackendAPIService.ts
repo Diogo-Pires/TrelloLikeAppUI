@@ -1,6 +1,7 @@
 import axios from "axios";
 import { Task } from "../domain/Task";
 import { SessionManagementService } from "./SessionManagementService";
+import { startLoading, stopLoading } from "../LoadingBar";
 
 const API_URL = "https://localhost:7223/";
 
@@ -12,6 +13,7 @@ export const api = axios.create({
 
 api.interceptors.request.use(
   (config) => {
+    startLoading();
     const token = SessionManagementService.getToken();
 
     if (token) {
@@ -26,12 +28,14 @@ api.interceptors.request.use(
 );
 
 api.interceptors.response.use(
-  (response) => response, 
+  (response) => {
+    stopLoading();
+    return response;
+  },
   (error) => {
+    stopLoading();
     if (error.response?.status === 401) {
-      console.error("Token expired. Logging out...");
       SessionManagementService.logout();
-      window.location.href = "/login";
     }
     return Promise.reject(error);
   }

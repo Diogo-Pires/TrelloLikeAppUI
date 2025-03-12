@@ -13,6 +13,7 @@
     "@react-oauth/google": "^0.12.1",
     "fs": "^0.0.1-security",
     "jwt-decode": "^4.0.0",
+    "nprogress": "^0.2.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-toastify": "^11.0.5"
@@ -20,6 +21,7 @@
   "devDependencies": {
     "@eslint/js": "^9.21.0",
     "@types/node": "^22.13.10",
+    "@types/nprogress": "^0.2.3",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",

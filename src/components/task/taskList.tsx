@@ -1,6 +1,7 @@
 import { useEffect } from "react";
 import { useTaskContext } from "../../contexts/TaskContext";
 import { fetchTasks } from "../../services/MainBackendAPIService";
+import { toast } from "react-toastify";
 
 const TaskList = () => {
   const { tasks, setTasks } = useTaskContext();
@@ -11,7 +12,9 @@ const TaskList = () => {
         const data = await fetchTasks();
         setTasks(data);
       } catch (error) {
-        console.error("Failed to fetch tasks", error);
+        var msg = `${error}`
+        console.error(msg);
+        toast.error(msg);
       }
     };
 

@@ -23,6 +23,7 @@ export const SessionManagementService = {
   logout: () => {
     sessionStorage.removeItem(TOKEN_KEY);
     sessionStorage.removeItem(TOKEN_USER_KEY);
+    window.location.href = "/login";
   },
 
   isAuthenticated: (): boolean => {
@@ -43,4 +44,4 @@ const extractTokenInformation = (token: string):  User | null => {
       console.error("Invalid token", error);
       return null;
     }
-  };
+};

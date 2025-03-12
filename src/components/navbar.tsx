@@ -1,9 +1,10 @@
-import { SessionManagementService } from "../services/SessionManagementService";
+import { useUserContext } from "../contexts/UserContext";
 
 const Navbar = () => {
-  const user = SessionManagementService.getAuhenticateUser();
+  const { user, setUser } = useUserContext();
+
   const handleLogout = () => {
-    SessionManagementService.logout(); 
+    setUser(null);
   };
 
   return (

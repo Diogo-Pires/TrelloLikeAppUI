@@ -1,23 +1,31 @@
-import { createContext, useContext, useState, ReactNode } from "react";
+import { createContext, useContext, useState, ReactNode, useEffect } from "react";
 import { User } from "../domain/User";
+import { SessionManagementService } from "../services/SessionManagementService";
 
 interface UserContextType {
   user: User | null;
-  login:  (userData: User)  => void;
-  logout: () => void;
+  setUser: (user: User | null) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
 UserContext.displayName = "User"
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<UserContextType['user']>(null);
+  const [user, setUser] = useState<User | null>(() => {
+    return SessionManagementService.getAuhenticateUser();
+  });
 
-  // return (
-  //   <UserContext.Provider value={{ user, login, logout }}>
-  //     {children}
-  //   </UserContext.Provider>
-  // );
+  useEffect(() => {
+    if (!user) {
+      SessionManagementService.logout();
+    }
+  }, [user]);
+
+  return (
+    <UserContext.Provider value={{ user, setUser }}>
+      {children}
+    </UserContext.Provider>
+  );
 };
 
 export const useUserContext = (): UserContextType => {
@@ -25,15 +33,5 @@ export const useUserContext = (): UserContextType => {
   if (!context) {
     throw new Error("useUserContext must be used within a UserProvider");
   }
-  return context;
-};
-
-export const useAuth = () => {
-  const context = useContext(UserContext);
-
-  if (!context) {
-    throw new Error('useAuth must be used within a UserProvider');
-  }
-
   return context;
 };
