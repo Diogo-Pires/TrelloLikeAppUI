@@ -14,6 +14,8 @@ function LoginPage() {
   
     setToken(token); 
 
+    console.log(token);
+
     try {
       SessionManagementService.saveToken(token); 
       navigate('/tasks');
@@ -26,11 +28,20 @@ function LoginPage() {
 
   return (
     <div className="login-container">
-      {!token ? (
-        <GoogleLoginButton onLoginSuccess={handleLoginSuccess} />
-      ) : (
-        <></>
-      )}
+      <h2>Welcome to Task Manager</h2>
+      <h4>Please login yourself below</h4>
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        marginTop: '15px'
+      }}>
+        {!token ? (
+          <GoogleLoginButton onLoginSuccess={handleLoginSuccess} />
+        ) : (
+          <></>
+        )}
+      </div>
     </div>
   );
 }

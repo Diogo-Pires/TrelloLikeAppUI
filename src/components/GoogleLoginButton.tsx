@@ -11,7 +11,7 @@ const GoogleLoginButton = ({ onLoginSuccess }: { onLoginSuccess: (token: string 
             onLoginSuccess(token);
           }}
           onError={() => {
-            console.log("Login Failed");
+            console.error("Login Failed");
           }}
         />
       </GoogleOAuthProvider>

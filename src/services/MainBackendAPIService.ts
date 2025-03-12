@@ -2,6 +2,7 @@ import axios from "axios";
 import { Task } from "../domain/Task";
 import { SessionManagementService } from "./SessionManagementService";
 import { startLoading, stopLoading } from "../LoadingBar";
+import { toast } from "react-toastify";
 
 const API_URL = "https://localhost:7223/";
 
@@ -41,7 +42,15 @@ api.interceptors.response.use(
   }
 );
 
-export const fetchTasks = async (): Promise<Task[]> => {
-  const response = await api.get("/tasks/");
+export const fetchUserTasks = async (): Promise<Task[]> => {
+  const user = SessionManagementService.getAuhenticateUser();
+  if(!user) {
+    var msg = 'User not logged in';
+    toast.error(msg);
+    SessionManagementService.logout();
+    return Promise.reject(msg);
+  }
+
+  const response = await api.get(`/tasks/assignedTo/${user.email}`);
   return response.data;
 };

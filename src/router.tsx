@@ -1,5 +1,4 @@
 import { Route, Routes, BrowserRouter as Router, useLocation } from "react-router-dom";
-import { TaskProvider } from "./contexts/TaskContext";
 import { ToastContainer } from "react-toastify";
 import Navbar from "./components/Navbar";
 import LoginPage from "./pages/LoginPage";
@@ -31,9 +30,7 @@ const AppContent = () => {
           <Route path="/tasks" element={
             <UserProvider>
               <Navbar/>
-              <TaskProvider>
-                <TasksPage />
-              </TaskProvider>
+              <TasksPage />
             </UserProvider>
             }/>
         </Routes>

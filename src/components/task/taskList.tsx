@@ -1,25 +1,15 @@
-import { useEffect } from "react";
-import { useTaskContext } from "../../contexts/TaskContext";
-import { fetchTasks } from "../../services/MainBackendAPIService";
+
+import { fetchUserTasks } from "../../services/MainBackendAPIService";
 import { toast } from "react-toastify";
+import { useQuery } from "@tanstack/react-query";
 
 const TaskList = () => {
-  const { tasks, setTasks } = useTaskContext();
+  const { data: tasks = [], error } = useQuery({
+    queryKey: ['tasks'],
+    queryFn: fetchUserTasks
+  });
 
-  useEffect(() => {
-    const getTasks = async () => {
-      try {
-        const data = await fetchTasks();
-        setTasks(data);
-      } catch (error) {
-        var msg = `${error}`
-        console.error(msg);
-        toast.error(msg);
-      }
-    };
-
-    getTasks();
-  }, [setTasks]);
+  if (error) return toast.error('Error loading tasks');
 
   return (
     <div>
