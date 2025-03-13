@@ -14,8 +14,6 @@ function LoginPage() {
   
     setToken(token); 
 
-    console.log(token);
-
     try {
       SessionManagementService.saveToken(token); 
       navigate('/tasks');
