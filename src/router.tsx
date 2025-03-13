@@ -6,6 +6,7 @@ import TasksPage from "./pages/TasksPage";
 import { UserProvider } from "./contexts/UserContext";
 import { useEffect } from "react";
 import { startLoading, stopLoading } from "./LoadingBar";
+import TaskPage from "./pages/TaskPage";
 
 const RouteChangeTracker = () => {
   const location = useLocation();
@@ -27,6 +28,12 @@ const AppContent = () => {
         <RouteChangeTracker />
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/task/:taskId" element={
+            <UserProvider>
+              <Navbar/>
+              <TaskPage />
+            </UserProvider>
+          } />
           <Route path="/tasks" element={
             <UserProvider>
               <Navbar/>

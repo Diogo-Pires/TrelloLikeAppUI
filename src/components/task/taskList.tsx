@@ -2,16 +2,15 @@
 import { fetchUserTasks } from "../../services/MainBackendAPIService";
 import { toast } from "react-toastify";
 import { useQuery } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import LoadingMsg from "../Loading";
-import { appCallMaxNumberOfRetries, ExponentialBackoff } from "../../shared/retryPolicyFunctions";
+import { Switch } from "@radix-ui/react-switch";
+import { Link } from "react-router-dom";
 
 const TaskList = () => {
   const { data: tasks = [], isLoading, error } = useQuery({
     queryKey: ['tasks'],
-    queryFn: fetchUserTasks,
-    retry: appCallMaxNumberOfRetries, 
-    retryDelay: ExponentialBackoff
+    queryFn: fetchUserTasks
   });
   
   useEffect(() => {
@@ -20,19 +19,38 @@ const TaskList = () => {
     }
   }, [error]);
 
+  const [showCompleted, setShowCompleted] = useState(false);
+
+  const filteredTasks = tasks.filter((task) =>
+    showCompleted ? task.completedAt : !task.completedAt
+  );
+
   return (
     <div>
-      
-  <LoadingMsg isLoading={isLoading}></LoadingMsg>
+      <LoadingMsg isLoading={isLoading}></LoadingMsg>
       {!error ? (
-        tasks.map((task) => (
+        <>
+        <div className="flex items-center gap-2 mb-4">
+          <label>Show Completed</label>
+          <Switch
+            checked={showCompleted}
+            onCheckedChange={setShowCompleted} 
+            className="switch"
+            />
+              <span className="switch-thumb"></span>
+        </div>
+        {filteredTasks.length ? filteredTasks.map((task) => (
           <div key={task.id} className="task-card">
-            <label>
+            <Link to={{
+                pathname: `/task/${task.id}`
+              }} >
               <h3>{task.title}</h3>
               <p>{task.description}</p>
-            </label>
+            </Link>
           </div>
-         ))) : (<p>Something wrong happened, please try it again later</p>)
+         )) : (<p>No tasks found...</p>)}
+         </>) 
+         : (<p>Something wrong happened, please try it again later</p>)
       }
     </div>
   );
