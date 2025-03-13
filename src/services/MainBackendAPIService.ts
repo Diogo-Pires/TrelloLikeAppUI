@@ -7,7 +7,6 @@ import { appCallMaxNumberOfRetries, ExponentialBackoff } from "../shared/retryPo
 import { User } from "../domain/User";
 
 const API_URL = "https://localhost:7223/";
-let user : (User | null) = null;
 
 export const api = axios.create({
   baseURL: API_URL,
@@ -20,7 +19,7 @@ api.interceptors.request.use(
   (config) => {
     startLoading();
       
-    user = SessionManagementService.getAuhenticateUser();
+    const user = SessionManagementService.getAuhenticateUser();
     if(!user) {
       DealWithNoAuthenticateUser();
     }
@@ -67,6 +66,11 @@ api.interceptors.response.use(
 );
 
 export const fetchUserTasks = async (): Promise<Task[]> => {
+  const user = SessionManagementService.getAuhenticateUser();
+  if(!user){
+    DealWithNoAuthenticateUser();
+  }
+
   const response = await api.get(`/tasks/assignedTo/${user?.email}`);
   return response.data;
 };

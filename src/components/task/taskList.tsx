@@ -10,7 +10,8 @@ import { Link } from "react-router-dom";
 const TaskList = () => {
   const { data: tasks = [], isLoading, error } = useQuery({
     queryKey: ['tasks'],
-    queryFn: fetchUserTasks
+    queryFn: fetchUserTasks,
+    refetchOnWindowFocus: false
   });
   
   useEffect(() => {

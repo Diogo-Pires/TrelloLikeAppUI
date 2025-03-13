@@ -3,15 +3,16 @@ import { useParams, useLocation } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Task } from "../domain/Task";
 import { fetchTaskDetails } from "../services/MainBackendAPIService";
+import { DatetimeToDateString } from "../shared/DateFunctions";
 
 const TaskPage = () => {
   const { taskId } = useParams<{ taskId: string }>();
-  const queryClient = useQueryClient();
 
   const { data: task, isLoading, error } = useQuery<Task>({
-        queryKey: ["task", taskId],
-        queryFn: () => fetchTaskDetails(taskId!)
-    });
+    queryKey: ["task", taskId],
+    queryFn: () => fetchTaskDetails(taskId!),
+    refetchOnWindowFocus: false
+  });
 
 //   const mutation = useMutation(updateTaskDetails, {
 //     onSuccess: () => {
@@ -28,11 +29,8 @@ const TaskPage = () => {
 
   useEffect(() => {
     if (task) {
-        console.log('test:', task)
       setUpdatedTask({ ...task });
     }
-    
-
   }, [task]);
 
   if (isLoading) return <p>Loading...</p>;
@@ -57,7 +55,7 @@ const TaskPage = () => {
     <div>
       <h2>Edit Task</h2>
       {(
-        <form onSubmit={handleSubmit}>
+        <form className="task-form-container" onSubmit={handleSubmit}>
           <div>
             <label>Title</label>
             <input
@@ -69,19 +67,10 @@ const TaskPage = () => {
           </div>
           <div>
             <label>Description</label>
-            <input
+            <textarea
               type="text"
               name="description"
               value={task?.description}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Completed Date</label>
-            <input
-              type="date"
-              name="completedDate"
-              value={task?.completedAt?.toLocaleDateString()}
               onChange={handleChange}
             />
           </div>
@@ -90,7 +79,7 @@ const TaskPage = () => {
             <input
               type="date"
               name="createdDate"
-              value={task?.createdAt?.toLocaleDateString()}
+              value={DatetimeToDateString(task?.createdAt)}
               onChange={handleChange}
               disabled
             />
@@ -100,27 +89,18 @@ const TaskPage = () => {
             <input
               type="date"
               name="deadline"
-              value={task?.deadline?.toLocaleDateString()}
+              value={DatetimeToDateString(task?.deadline)}
               onChange={handleChange}
             />
           </div>
           <div>
             <label>Status</label>
-            <input
-              type="text"
-              name="status"
-              value={task?.status}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Completed</label>
-            <input
-              type="checkbox"
-              name="completed"
-              checked={!!task?.completedAt}
-              onChange={handleChange}
-            />
+            <select name="status" value={updatedTask?.status || ""} onChange={handleChange}>
+                <option value="Pending">Pending</option>
+                <option value="inProgress">In Progress</option>
+                <option value="Completed">Completed</option>
+                <option value="Cancelled">Cancelled</option>
+            </select>
           </div>
           <button type="submit">Save Changes</button>
         </form>
