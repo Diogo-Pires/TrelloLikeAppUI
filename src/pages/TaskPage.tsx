@@ -39,11 +39,14 @@ const TaskPage = () => {
   const onSubmit = (data: Task) => {  
     const updatedTask = {
       ...data, 
-      id: taskId,  // Add the id
+      id: taskId,
     };
+
+    if(!data.deadline){
+      delete updatedTask.deadline; 
+    }
   
     delete updatedTask.createdAt; 
-
     mutation.mutate(updatedTask); 
   };
 
@@ -73,24 +76,24 @@ const TaskPage = () => {
           <div>
             <label>Created At:</label>
             <input
-            type="text"
+            type="date"
             value={DatetimeToDateString(task?.createdAt)} 
             disabled
             />
         </div>
         <div>
         <label>Deadline:</label>
-        <input
-          type="date"
-          {...register("deadline", { required: "Deadline is required" })}
-          />
+        <input 
+        type="date" 
+        {...register("deadline", { required: "Deadline is required" })} 
+        />
          {errors.deadline && <p>{errors.deadline.message}</p>}
         </div>
         <div>
         <label>Status:</label>
         <select {...register("status")}>
             <option value="Pending">Pending</option>
-            <option value="inProgress">In Progress</option>
+            <option value="InProgress">In Progress</option>
             <option value="Completed">Completed</option>
             <option value="Cancelled">Cancelled</option>
         </select>
@@ -98,8 +101,6 @@ const TaskPage = () => {
       <button type="submit" disabled={mutation.isLoading}>
         {mutation.isLoading ? "Updating..." : "Save"}
       </button>
-
-      {mutation.isError && <p>Error updating task.</p>}
       </form>
       )}
     </div>
