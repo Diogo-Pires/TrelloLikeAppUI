@@ -1,17 +1,15 @@
-import axios, { AxiosInstance } from "axios";
+import axios from "axios";
 import { Task } from "../domain/Task";
 import { SessionManagementService } from "./SessionManagementService";
 import { startLoading, stopLoading } from "../LoadingBar";
 import { toast } from "react-toastify";
-import { appCallMaxNumberOfRetries, ExponentialBackoff } from "../shared/retryPolicyFunctions";
-import { User } from "../domain/User";
+import { appCallMaxNumberOfRetries, ExponentialBackoff } from "../shared/RetryPolicyFunctions";
 
 const API_URL = "https://localhost:7223/";
 
 export const api = axios.create({
   baseURL: API_URL,
   headers: { "Content-Type": "application/json" },
-  timeout: 5000,
   withCredentials: true
 });
 
@@ -77,6 +75,11 @@ export const fetchUserTasks = async (): Promise<Task[]> => {
 
 export const fetchTaskDetails = async (id: string): Promise<Task> => {
   const response = await api.get(`/tasks/${id}`);
+  return response.data;
+};
+
+export const updateTaskDetails = async (task: Task): Promise<Task> => {
+  const response = await api.put(`/tasks`, JSON.stringify(task));
   return response.data;
 };
 

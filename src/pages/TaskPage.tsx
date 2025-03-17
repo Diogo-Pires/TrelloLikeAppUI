@@ -1,12 +1,14 @@
-import React, { useState, useEffect } from "react";
-import { useParams, useLocation } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { Task } from "../domain/Task";
-import { fetchTaskDetails } from "../services/MainBackendAPIService";
+import { fetchTaskDetails, updateTaskDetails } from "../services/MainBackendAPIService";
 import { DatetimeToDateString } from "../shared/DateFunctions";
+import { useForm } from "react-hook-form";
+import { toast } from "react-toastify";
 
 const TaskPage = () => {
   const { taskId } = useParams<{ taskId: string }>();
+  const queryClient = useQueryClient();
 
   const { data: task, isLoading, error } = useQuery<Task>({
     queryKey: ["task", taskId],
@@ -14,96 +16,91 @@ const TaskPage = () => {
     refetchOnWindowFocus: false
   });
 
-//   const mutation = useMutation(updateTaskDetails, {
-//     onSuccess: () => {
-//       toast.success("Task updated successfully");
-//       queryClient.invalidateQueries(["tasks"]); // To refetch task list after update
-//       history.push("/tasks"); // Redirect back to task list page
-//     },
-//     onError: () => {
-//       toast.error("Error updating task");
-//     },
-//   });
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<Task>();
 
-  const [updatedTask, setUpdatedTask] = useState<Task | null>(null);
+  if (task) {
+    setValue("title", task.title);
+    setValue("description", task.description);
+    setValue("status", task.status);
+    setValue("deadline", task.deadline);
+  }
 
-  useEffect(() => {
-    if (task) {
-      setUpdatedTask({ ...task });
-    }
-  }, [task]);
+  const mutation = useMutation<Task, Error, Task>({
+    mutationFn: updateTaskDetails, 
+    onSuccess: () => {
+      toast.success("Task updated successfully");
+      queryClient.invalidateQueries({ queryKey: ["task", taskId] }); 
+    },
+    onError: (err) => {
+      toast.error(`Error updating task: ${err}`);
+    },
+  });
+
+  const onSubmit = (data: Task) => {  
+    const updatedTask = {
+      ...data, 
+      id: taskId,  // Add the id
+    };
+  
+    delete updatedTask.createdAt; 
+
+    mutation.mutate(updatedTask); 
+  };
 
   if (isLoading) return <p>Loading...</p>;
   if (error) return <p>Error loading task details</p>;
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value, type, checked } = e.target;
-    setUpdatedTask((prev) => ({
-      ...prev!,
-      [name]: type === "checkbox" ? checked : value,
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (updatedTask) {
-      //mutation.mutate(updatedTask);
-    }
-  };
 
   return (
     <div>
       <h2>Edit Task</h2>
       {(
-        <form className="task-form-container" onSubmit={handleSubmit}>
+        <form className="task-form-container" onSubmit={handleSubmit(onSubmit)}>
           <div>
             <label>Title</label>
             <input
-              type="text"
-              name="title"
-              value={task?.title}
-              onChange={handleChange}
+            type="text"
+            {...register("title", { required: "Title is required" })}
             />
+            {errors.title && <p>{errors.title.message}</p>}
           </div>
           <div>
             <label>Description</label>
             <textarea
-              type="text"
-              name="description"
-              value={task?.description}
-              onChange={handleChange}
+            {...register("description", { required: "Description is required" })}
             />
+            {errors.description && <p>{errors.description.message}</p>}
           </div>
           <div>
-            <label>Created Date</label>
+            <label>Created At:</label>
             <input
-              type="date"
-              name="createdDate"
-              value={DatetimeToDateString(task?.createdAt)}
-              onChange={handleChange}
-              disabled
+            type="text"
+            value={DatetimeToDateString(task?.createdAt)} 
+            disabled
             />
-          </div>
-          <div>
-            <label>Deadline</label>
-            <input
-              type="date"
-              name="deadline"
-              value={DatetimeToDateString(task?.deadline)}
-              onChange={handleChange}
-            />
-          </div>
-          <div>
-            <label>Status</label>
-            <select name="status" value={updatedTask?.status || ""} onChange={handleChange}>
-                <option value="Pending">Pending</option>
-                <option value="inProgress">In Progress</option>
-                <option value="Completed">Completed</option>
-                <option value="Cancelled">Cancelled</option>
-            </select>
-          </div>
-          <button type="submit">Save Changes</button>
-        </form>
+        </div>
+        <div>
+        <label>Deadline:</label>
+        <input
+          type="date"
+          {...register("deadline", { required: "Deadline is required" })}
+          />
+         {errors.deadline && <p>{errors.deadline.message}</p>}
+        </div>
+        <div>
+        <label>Status:</label>
+        <select {...register("status")}>
+            <option value="Pending">Pending</option>
+            <option value="inProgress">In Progress</option>
+            <option value="Completed">Completed</option>
+            <option value="Cancelled">Cancelled</option>
+        </select>
+      </div>
+      <button type="submit" disabled={mutation.isLoading}>
+        {mutation.isLoading ? "Updating..." : "Save"}
+      </button>
+
+      {mutation.isError && <p>Error updating task.</p>}
+      </form>
       )}
     </div>
   );
