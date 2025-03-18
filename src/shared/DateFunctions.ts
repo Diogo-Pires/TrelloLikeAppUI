@@ -1,8 +1,20 @@
 import { parseISO, format } from "date-fns";
 
-export const DatetimeToDateString = (dateTime: Date | undefined): string | undefined => {
+export const DatetimeToDateString = (dateTime: Date | string | undefined): string | undefined => {
     if (!dateTime) {
-        return ""; // Return an empty string when null/undefined
+        return "";
+    }
+
+    let parsedDate: Date | undefined = DatetimeToDate(dateTime);
+    if(!parsedDate)
+        return "";
+
+    return isNaN(parsedDate?.getTime()) ? "" : format(parsedDate, "yyyy-MM-dd");
+} 
+
+export const DatetimeToDate = (dateTime: Date | string | undefined): Date | undefined => {
+    if (!dateTime) {
+        return undefined;
     }
 
     let parsedDate: Date;
@@ -13,8 +25,8 @@ export const DatetimeToDateString = (dateTime: Date | undefined): string | undef
         parsedDate = parseISO(dateTime);
     } else {
         console.warn("Invalid date format:", dateTime);
-        return "";
+        return undefined;
     }
 
-    return isNaN(parsedDate.getTime()) ? "" : format(parsedDate, "yyyy-MM-dd");
+    return parsedDate;
 } 

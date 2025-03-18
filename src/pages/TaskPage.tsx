@@ -1,31 +1,32 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { Task } from "../domain/Task";
 import { fetchTaskDetails, updateTaskDetails } from "../services/MainBackendAPIService";
-import { DatetimeToDateString } from "../shared/DateFunctions";
+import { DatetimeToDate, DatetimeToDateString } from "../shared/DateFunctions";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
+import { UpdateTask } from "../domain/UpdateTask";
 
 const TaskPage = () => {
   const { taskId } = useParams<{ taskId: string }>();
   const queryClient = useQueryClient();
+  queryClient.invalidateQueries({ queryKey: ["task", taskId] }); 
 
-  const { data: task, isLoading, error } = useQuery<Task>({
+  const { data: task, isLoading, error } = useQuery<UpdateTask>({
     queryKey: ["task", taskId],
     queryFn: () => fetchTaskDetails(taskId!),
     refetchOnWindowFocus: false
   });
 
-  const { register, handleSubmit, setValue, formState: { errors } } = useForm<Task>();
+  const { register, handleSubmit, setValue, formState: { errors } } = useForm<UpdateTask>();
 
   if (task) {
     setValue("title", task.title);
     setValue("description", task.description);
     setValue("status", task.status);
-    setValue("deadline", task.deadline);
+    setValue("deadline", DatetimeToDateString(task.deadline));
   }
 
-  const mutation = useMutation<Task, Error, Task>({
+  const mutation = useMutation<UpdateTask, Error, UpdateTask>({
     mutationFn: updateTaskDetails, 
     onSuccess: () => {
       toast.success("Task updated successfully");
@@ -36,7 +37,7 @@ const TaskPage = () => {
     },
   });
 
-  const onSubmit = (data: Task) => {  
+  const onSubmit = (data: UpdateTask) => {  
     const updatedTask = {
       ...data, 
       id: taskId,
@@ -47,7 +48,7 @@ const TaskPage = () => {
     }
   
     delete updatedTask.createdAt; 
-    mutation.mutate(updatedTask); 
+    mutation.mutate(updatedTask as UpdateTask); 
   };
 
   if (isLoading) return <p>Loading...</p>;
@@ -98,8 +99,8 @@ const TaskPage = () => {
             <option value="Cancelled">Cancelled</option>
         </select>
       </div>
-      <button type="submit" disabled={mutation.isLoading}>
-        {mutation.isLoading ? "Updating..." : "Save"}
+      <button type="submit" disabled={mutation.isPending}>
+        {mutation.isPending ? "Updating..." : "Save"}
       </button>
       </form>
       )}

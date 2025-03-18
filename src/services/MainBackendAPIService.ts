@@ -1,9 +1,10 @@
 import axios from "axios";
-import { Task } from "../domain/Task";
+import { UpdateTask } from "../domain/UpdateTask";
 import { SessionManagementService } from "./SessionManagementService";
 import { startLoading, stopLoading } from "../LoadingBar";
 import { toast } from "react-toastify";
 import { appCallMaxNumberOfRetries, ExponentialBackoff } from "../shared/RetryPolicyFunctions";
+import { Task } from "../domain/Task";
 
 const API_URL = "https://localhost:7223/";
 
@@ -73,12 +74,12 @@ export const fetchUserTasks = async (): Promise<Task[]> => {
   return response.data;
 };
 
-export const fetchTaskDetails = async (id: string): Promise<Task> => {
+export const fetchTaskDetails = async (id: string): Promise<UpdateTask> => {
   const response = await api.get(`/tasks/${id}`);
   return response.data;
 };
 
-export const updateTaskDetails = async (task: Task): Promise<Task> => {
+export const updateTaskDetails = async (task: UpdateTask): Promise<UpdateTask> => {
   const response = await api.put(`/tasks`, JSON.stringify(task));
   return response.data;
 };
