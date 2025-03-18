@@ -1,7 +1,7 @@
 import { useParams } from "react-router-dom";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { fetchTaskDetails, updateTaskDetails } from "../services/MainBackendAPIService";
-import { DatetimeToDate, DatetimeToDateString } from "../shared/DateFunctions";
+import { DatetimeToDateString } from "../shared/DateFunctions";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { UpdateTask } from "../domain/UpdateTask";
