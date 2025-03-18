@@ -5,13 +5,16 @@ import { DatetimeToDateString } from "../shared/DateFunctions";
 import { useForm } from "react-hook-form";
 import { toast } from "react-toastify";
 import { UpdateTask } from "../domain/UpdateTask";
+import LoadingMsg from "../components/Loading";
+import { useState } from "react";
+import { APIErrorResponse } from "../shared/APIErrorResponse";
 
 const TaskPage = () => {
   const { taskId } = useParams<{ taskId: string }>();
+  const [errorMessages, setErrorMessages] = useState<string[]>([]);
   const queryClient = useQueryClient();
-  queryClient.invalidateQueries({ queryKey: ["task", taskId] }); 
 
-  const { data: task, isLoading, error } = useQuery<UpdateTask>({
+  const { data: task, isLoading } = useQuery<UpdateTask>({
     queryKey: ["task", taskId],
     queryFn: () => fetchTaskDetails(taskId!),
     refetchOnWindowFocus: false
@@ -28,12 +31,16 @@ const TaskPage = () => {
 
   const mutation = useMutation<UpdateTask, Error, UpdateTask>({
     mutationFn: updateTaskDetails, 
+    onMutate: () => {
+      setErrorMessages([]);
+    },
     onSuccess: () => {
       toast.success("Task updated successfully");
       queryClient.invalidateQueries({ queryKey: ["task", taskId] }); 
     },
     onError: (err) => {
-      toast.error(`Error updating task: ${err}`);
+      const errorResponse = err as unknown as APIErrorResponse;
+      setErrorMessages(errorResponse.errors);
     },
   });
 
@@ -46,17 +53,15 @@ const TaskPage = () => {
     if(!data.deadline){
       delete updatedTask.deadline; 
     }
-  
+    
     delete updatedTask.createdAt; 
     mutation.mutate(updatedTask as UpdateTask); 
   };
 
-  if (isLoading) return <p>Loading...</p>;
-  if (error) return <p>Error loading task details</p>;
-
   return (
     <div>
       <h2>Edit Task</h2>
+      <LoadingMsg isLoading={isLoading}></LoadingMsg>
       {(
         <form className="task-form-container" onSubmit={handleSubmit(onSubmit)}>
           <div>
@@ -102,6 +107,13 @@ const TaskPage = () => {
       <button type="submit" disabled={mutation.isPending}>
         {mutation.isPending ? "Updating..." : "Save"}
       </button>
+      {errorMessages.length > 0 && (
+        <ul>
+          {errorMessages.map((error, index) => (
+            <li key={index} style={{ color: "red" }}>{error}</li>
+          ))}
+        </ul>
+      )}
       </form>
       )}
     </div>

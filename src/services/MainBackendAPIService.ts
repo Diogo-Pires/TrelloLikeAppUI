@@ -1,10 +1,11 @@
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import { UpdateTask } from "../domain/UpdateTask";
 import { SessionManagementService } from "./SessionManagementService";
 import { startLoading, stopLoading } from "../LoadingBar";
 import { toast } from "react-toastify";
 import { appCallMaxNumberOfRetries, ExponentialBackoff } from "../shared/RetryPolicyFunctions";
 import { Task } from "../domain/Task";
+import { APIErrorResponse } from "../shared/APIErrorResponse";
 
 const API_URL = "https://localhost:7223/";
 
@@ -28,6 +29,8 @@ api.interceptors.request.use(
     if (token) {
       config.headers.Authorization = `Bearer ${token}`; 
     }
+
+    config.signal = new AbortController().signal;
 
     return config;
   },
@@ -60,6 +63,13 @@ api.interceptors.response.use(
     if (error.response?.status === 401) {
       SessionManagementService.logout();
     }
+
+    const axiosError = error as AxiosError<APIErrorResponse>;
+    if (axiosError.response?.status === 400 && axiosError.response.data?.errors) {
+      console.error("Validation Error:", axiosError.response.data.errors);
+      return Promise.reject(axiosError.response.data);
+    }
+
     return Promise.reject(error);
   }
 );
