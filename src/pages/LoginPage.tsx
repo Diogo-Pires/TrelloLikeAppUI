@@ -1,22 +1,22 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import GoogleLoginButton from "../components/GoogleLoginButton";
-import { SessionManagementService } from "../services/SessionManagementService";
+import { extractTokenInformation } from "../shared/ExtractTokenInformation";
+import { useDispatch, useSelector } from "react-redux";
+import { login } from "../stores/authSlice";
+import { User } from "../domain/User";
+import { RootState } from "../stores/store";
 
 function LoginPage() {
-  const [token, setToken] = useState<string | undefined>(undefined);
-  const navigate = useNavigate();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
 
   const handleLoginSuccess = async (token: string | undefined) => {
     if(token === undefined)
       return;
-  
-    setToken(token); 
 
     try {
-      SessionManagementService.saveToken(token); 
-      navigate('/tasks');
+      var userInfo = extractTokenInformation(token); 
+      dispatch(login({user: userInfo as User, token}));
     } catch (error) {
       var msg = `${error}`
       console.error(msg);
@@ -34,7 +34,7 @@ function LoginPage() {
         alignItems: 'center',
         marginTop: '15px'
       }}>
-        {!token ? (
+        {!user ? (
           <GoogleLoginButton onLoginSuccess={handleLoginSuccess} />
         ) : (
           <></>

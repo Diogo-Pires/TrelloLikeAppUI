@@ -1,10 +1,13 @@
-import { useUserContext } from "../contexts/UserContext";
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../stores/authSlice";
+import { RootState } from "../stores/store";
 
 const Navbar = () => {
-  const { user, setUser } = useUserContext();
+  const user = useSelector((state: RootState) => state.auth.user);
+  const dispatch = useDispatch();
 
-  const handleLogout = () => {
-    setUser(null);
+  const handleLogout = () => { 
+    dispatch(logout());
   };
 
   return (

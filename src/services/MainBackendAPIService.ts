@@ -1,11 +1,11 @@
 import axios, { AxiosError } from "axios";
 import { UpdateTask } from "../domain/UpdateTask";
-import { SessionManagementService } from "./SessionManagementService";
 import { startLoading, stopLoading } from "../LoadingBar";
-import { toast } from "react-toastify";
 import { appCallMaxNumberOfRetries, ExponentialBackoff } from "../shared/RetryPolicyFunctions";
 import { Task } from "../domain/Task";
 import { APIErrorResponse } from "../shared/APIErrorResponse";
+import { dispatch, getState } from "../stores/store";
+import { logout } from "../stores/authSlice";
 
 const API_URL = "https://localhost:7223/";
 
@@ -18,20 +18,20 @@ export const api = axios.create({
 api.interceptors.request.use(
   (config) => {
     startLoading();
-      
-    const user = SessionManagementService.getAuhenticateUser();
-    if(!user) {
-      DealWithNoAuthenticateUser();
+
+    const state = getState();
+    const user = state.auth.user; 
+    const token = state.auth.token; 
+
+    if (!user || !token) {
+      dispatch(logout());
     }
 
-    const token = SessionManagementService.getToken();
-
     if (token) {
-      config.headers.Authorization = `Bearer ${token}`; 
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     config.signal = new AbortController().signal;
-
     return config;
   },
   (error) => {
@@ -61,7 +61,7 @@ api.interceptors.response.use(
   (error) => {
     stopLoading();
     if (error.response?.status === 401) {
-      SessionManagementService.logout();
+      dispatch(logout());
     }
 
     const axiosError = error as AxiosError<APIErrorResponse>;
@@ -74,13 +74,11 @@ api.interceptors.response.use(
   }
 );
 
-export const fetchUserTasks = async (): Promise<Task[]> => {
-  const user = SessionManagementService.getAuhenticateUser();
-  if(!user){
-    DealWithNoAuthenticateUser();
-  }
+export const fetchUserTasks = async (email: string | undefined): Promise<Task[]> => {
+  if(!email)
+    dispatch(logout());
 
-  const response = await api.get(`/tasks/assignedTo/${user?.email}`);
+  const response = await api.get(`/tasks/assignedTo/${email}`);
   return response.data;
 };
 
@@ -93,10 +91,3 @@ export const updateTaskDetails = async (task: UpdateTask): Promise<UpdateTask> =
   const response = await api.put(`/tasks`, JSON.stringify(task));
   return response.data;
 };
-
-const DealWithNoAuthenticateUser = (): Promise<any> =>{
-  var msg = 'User not logged in';
-  toast.error(msg);
-  SessionManagementService.logout();
-  return Promise.reject(msg);
-}

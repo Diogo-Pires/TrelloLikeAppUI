@@ -6,11 +6,15 @@ import { useEffect, useState } from "react";
 import LoadingMsg from "../Loading";
 import { Switch } from "@radix-ui/react-switch";
 import { Link } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { RootState } from "../../stores/store";
 
 const TaskList = () => {
+  const user = useSelector((state: RootState) => state.auth.user);
+  
   const { data: tasks = [], isLoading, error } = useQuery({
     queryKey: ['tasks'],
-    queryFn: fetchUserTasks,
+    queryFn: () => fetchUserTasks(user?.email),
     refetchOnWindowFocus: false
   });
   
