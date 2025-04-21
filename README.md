@@ -1,6 +1,6 @@
 # 📝 My Trello-like App (React + Vite)
 
-This is a simple **Trello-like task management UI** built with **React + TypeScript + Vite**. It connects to a custom .NET 8 API for managing tasks, including login functionality and multiple boards.
+This is a **ongoing** simple **Trello-like task management UI** built with **React + TypeScript + Vite**. It connects to a custom .NET 8 API for managing tasks, including login functionality and multiple boards.
 
 ---
 
