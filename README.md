@@ -76,4 +76,4 @@ Password: password
  - Mobile responsive tweaks
 
 ## 📄 License
-MIT License © Diogo-Pires
+This project is licensed under the MIT License. See the LICENSE file for details.
